@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piyush Sharma - Executive Intelligence Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            /* Interviewer-friendly palette: calm blues/slates, neutral shadows */
+            --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #0b3b5e 100%); /* sky-600 → slate-900 */
+            --secondary-gradient: linear-gradient(135deg, #e5f0ff 0%, #dbeafe 100%); /* very light blues */
+            --accent-gradient: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); /* blue-400 → blue-600 */
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%); /* subtle teal/green */
+            --warning-gradient: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%); /* soft amber */
+            --neutral-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); /* gray-100 → gray-200 */
+           
+            --text-primary: #111827; /* gray-900 */
+            --text-secondary: #4b5563; /* gray-600 */
+            --text-light: #2563eb; /* blue-600 */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb; /* gray-50 */
+            --bg-tertiary: #f3f4f6; /* gray-100 */
+           
+            --shadow-light: 0 2px 15px rgba(0, 0, 0, 0.06);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.10);
+            --shadow-heavy: 0 15px 35px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.18); /* subtle blue glow */
+        }
+        html {
+            font-size: clamp(12px, 1.2vw, 18px);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
+            50% { transform: translateY(-15px) rotate(180deg); opacity: 1; }
+        }
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            max-width: min(95vw, 1800px);
+            margin: 0 auto;
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-heavy);
+            position: relative;
+            z-index: 2;
+        }
+        .left-panel {
+            width: clamp(280px, 30%, 450px);
+            background: var(--primary-gradient);
+            color: white;
+            padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 2vw, 2rem);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+        .left-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        .left-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .left-panel::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+        .left-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.8" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: grain 25s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes grain {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100px, -100px); }
+        }
+        .profile-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-bottom: clamp(2rem, 4vw, 3rem);
+        }
+        .profile-photo {
+            width: clamp(100px, 15vw, 140px);
+            height: clamp(100px, 15vw, 140px);
+            border-radius: 50%;
+            border: 5px solid rgba(255,255,255,0.25);
+            margin: 0 auto clamp(1rem, 2vw, 2rem);
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.8rem, 3vw, 2.8rem);
+            font-weight: 700;
+            box-shadow: var(--shadow-glow);
+            animation: profilePulse 4s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-photo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 3s linear infinite;
+        }
+        @keyframes profilePulse {
+            0%, 100% { transform: scale(1); box-shadow: var(--shadow-glow); }
+            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(37, 99, 235, 0.3); }
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        .profile-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 3vw, 2.3rem);
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        .profile-title {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+        .profile-company {
+            background: rgba(255,255,255,0.12);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border-radius: 15px;
+            margin-bottom: clamp(1.5rem, 3vw, 2rem);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.15);
+            animation: slideUp 1s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .highlight {
+            background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+            color: #2d3436;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 1rem;
+            box-shadow: var(--shadow-light);
+            animation: highlightGlow 3s ease-in-out infinite alternate;
+            font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+        }
+        @keyframes highlightGlow {
+            from { box-shadow: var(--shadow-light); }
+            to { box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4); }
+        }
+        .tab-nav {
+            position: relative;
+            z-index: 2;
+        }
+        .tab-button {
+            display: block;
+            width: 100%;
+            background: transparent;
+            color: rgba(255,255,255,0.85);
+            border: none;
+            padding: clamp(0.8rem, 1.5vw, 1rem) clamp(1rem, 2vw, 1.5rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+            font-weight: 500;
+            text-align: left;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.15);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+        .tab-button:hover {
+            color: white;
+            transform: translateX(8px);
+            background: rgba(255,255,255,0.1);
+        }
+        .tab-button:hover::before {
+            left: 0;
+        }
+        .tab-button.active {
+            color: white;
+            background: rgba(255,255,255,0.2);
+            box-shadow: var(--shadow-light);
+            transform: translateX(8px);
+        }
+        .tab-button i {
+            margin-right: 0.8rem;
+            width: 18px;
+            text-align: center;
+        }
+        .contact-section {
+            position: relative;
+            z-index: 2;
+            margin-top: clamp(2rem, 4vw, 3rem);
+            padding-top: clamp(1.5rem, 3vw, 2rem);
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+        }
+        .contact-item:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+        }
+        .contact-item i {
+            margin-right: 1rem;
+            width: 18px;
+            text-align: center;
+        }
+        .right-panel {
+            width: 70%;
+            padding: 0;
+            background: var(--bg-primary);
+        }
+        .content-wrapper {
+            padding: clamp(2rem, 4vw, 3rem);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section {
+            background: var(--bg-primary);
+            margin-bottom: clamp(2rem, 3vw, 2.5rem);
+            padding: clamp(1.5rem, 3vw, 2.5rem);
+            border-radius: 16px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-gradient);
+            border-radius: 0 3px 3px 0;
+        }
+        .section:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+        .section h3 {
+            font-family: 'Playfair Display', serif;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 600;
+        }
+        .section h3 i {
+            background: var(--primary-gradient);
+            padding: 0.5rem;
+            border-radius: 10px;
+            color: white;
+            font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+        }
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: clamp(1rem, 2vw, 1.5rem);
+            margin-top: 2rem;
+        }
+        .skill-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: clamp(1.5rem, 2.5vw, 2rem);
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .skill-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .skill-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+        .skill-item:hover::before {
+            transform: scaleX(1);
+        }
+        .skill-item h4 {
+            color: var(--text-primary);
+            font-size: clamp(1rem, 1.5vw, 1.1rem);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .timeline {
+            position: relative;
+            padding-left: clamp(2rem, 4vw, 3rem);
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-gradient);
+            border-radius: 3px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: clamp(2rem, 3vw, 2.5rem);
+            background: var(--bg-primary);
+            padding: clamp(1.5rem, 2.5vw, 2rem);
+            border-radius: 15px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: clamp(-2rem, -4vw, -3rem);
+            top: 1.5rem;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            animation: timelinePulse 3s ease-in-out infinite;
+        }
+        @keyframes timelinePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .timeline-item:hover {
+            transform: translateX(8px);
+            box-shadow: var(--shadow-medium);
+        }
+        .metric-card {
+            background: var(--primary-gradient);
+            color: white;
+            padding: clamp(1.5rem, 2.5vw, 2rem);
+            border-radius: 15px;
+            text-align: center;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            animation: rotate 12s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .metric-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--shadow-heavy);
+        }
+        .metric-value {
+            font-size: clamp(2rem, 3vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            position: relative;
+            z-index: 2;
+        }
+        .success-factor {
+            background: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 100%);
+            padding: clamp(1.5rem, 2.5vw, 1.8rem);
+            border-radius: 12px;
+            margin: 1rem 0;
+            border-left: 4px solid #2563eb;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .success-factor::before {
+            content: '✓';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #2563eb;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .success-factor:hover {
+            transform: translateX(8px);
+            box-shadow: var(--shadow-medium);
+        }
+        .patent-card {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: clamp(2rem, 3vw, 2.5rem);
+            border-radius: 20px;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+        .patent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            transition: left 0.6s ease;
+        }
+        .patent-card:hover {
+            transform: translateY(-8px) rotateX(2deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+        .patent-card:hover::before {
+            left: 100%;
+        }
+        .patent-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.3rem, 2vw, 1.6rem);
+            font-weight: 600;
+            color: #93c5fd;
+            margin-bottom: 1rem;
+            letter-spacing: -0.3px;
+        }
+        .patent-number {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            box-shadow: var(--shadow-light);
+        }
+        .patent-status {
+            background: var(--success-gradient);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: clamp(0.7rem, 1vw, 0.8rem);
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 0.8rem;
+        }
+        .patent-description {
+            font-size: clamp(0.9rem, 1.3vw, 1rem);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+        .patent-tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 1vw, 0.8rem);
+            margin-top: 1.5rem;
+        }
+        .tech-tag {
+            background: rgba(147, 197, 253, 0.15);
+            color: #2563eb;
+            padding: 0.4rem 1rem;
+            border-radius: 15px;
+            font-size: clamp(0.75rem, 1vw, 0.85rem);
+            border: 1px solid rgba(147, 197, 253, 0.25);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .tech-tag:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .patent-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+            gap: clamp(1rem, 2vw, 1.5rem);
+            margin-top: 2rem;
+            padding: clamp(2rem, 3vw, 2.5rem);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+            border-radius: 15px;
+            border: 1px solid rgba(37, 99, 235, 0.15);
+        }
+        .stat-item {
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-item:hover {
+            transform: scale(1.05);
+        }
+        .stat-value {
+            font-size: clamp(1.8rem, 2.5vw, 2.2rem);
+            font-weight: 700;
+            color: #2563eb;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label {
+            font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .floating-icon {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: clamp(2rem, 3vw, 2.5rem);
+            opacity: 0.08;
+            animation: floatIcon 5s ease-in-out infinite;
+        }
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+        }
+        .story-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: clamp(2rem, 4vw, 3rem);
+            border-radius: 20px;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .story-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="0.8" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+            opacity: 0.4;
+        }
+        .story-content {
+            position: relative;
+            z-index: 2;
+        }
+        .story-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #fde68a;
+        }
+        .story-paragraph {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+        .iron-man-quote {
+            background: rgba(253, 230, 138, 0.15);
+            border-left: 4px solid #fde68a;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            margin: 2rem 0;
+            border-radius: 10px;
+            font-style: italic;
+            font-size: clamp(1rem, 1.4vw, 1.1rem);
+            text-align: center;
+        }
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255,255,255,0.15);
+            z-index: 1000;
+        }
+        .scroll-progress {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        /* Large Screen Optimizations */
+        @media (min-width: 1920px) {
+            html {
+                font-size: 18px;
+            }
+           
+            .main-container {
+                max-width: 1600px;
+            }
+        }
+        /* Ultra-wide Screen Optimizations */
+        @media (min-width: 2560px) {
+            html {
+                font-size: 20px;
+            }
+           
+            .main-container {
+                max-width: 1800px;
+            }
+        }
+        /* Medium Screen Optimizations */
+        @media (max-width: 1440px) {
+            .left-panel {
+                width: 35%;
+            }
+           
+            .right-panel {
+                width: 65%;
+            }
+        }
+        /* Tablet Optimizations */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+                max-width: 95vw;
+            }
+           
+            .left-panel, .right-panel {
+                width: 100%;
+            }
+           
+            .left-panel {
+                height: auto;
+                position: relative;
+            }
+           
+            .tab-nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 2rem;
+            }
+           
+            .tab-button {
+                flex: 1;
+                min-width: 140px;
+                text-align: center;
+                transform: none;
+            }
+           
+            .tab-button:hover,
+            .tab-button.active {
+                transform: none;
+            }
+           
+            .skill-grid {
+                grid-template-columns: 1fr;
+            }
+            .patent-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+           
+            .main-container {
+                margin: 0;
+                max-width: 100vw;
+            }
+           
+            .content-wrapper {
+                padding: 1.5rem;
+            }
+           
+            .patent-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles"></div>
+   
+    <div class="scroll-indicator">
+        <div class="scroll-progress"></div>
+    </div>
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="profile-container">
+                <div class="profile-photo">PS</div>
+                <h1 class="profile-name">Piyush Sharma</h1>
+                <div class="profile-title">Electrical Design Engineer & Innovation Leader</div>
+                <div class="profile-company">
+                    <strong>Lead Application Engineer</strong><br>
+                    Columbia, South Carolina, United States<br>
+                    <div class="highlight">
+                        <i class="fas fa-lightbulb"></i> Engineering Innovation & Leadership
+                    </div>
+                </div>
+            </div>
+            <div class="tab-nav">
+                <button class="tab-button active" onclick="openTab(event, 'tab1')">
+                    <i class="fas fa-book-open"></i> My Story
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'tab2')">
+                    <i class="fas fa-user-tie"></i> Professional DNA
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'tab3')">
+                    <i class="fas fa-chart-line"></i> Career Journey
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'tab4')">
+                    <i class="fas fa-cogs"></i> Skills Matrix
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'tab5')">
+                    <i class="fas fa-file-contract"></i> Patent Portfolio
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'tab6')">
+                    <i class="fas fa-brain"></i> Personality
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'tab7')">
+                    <i class="fas fa-heart"></i> Personal Insights
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'tab8')">
+                    <i class="fas fa-trophy"></i> Success Factors
+                </button>
+            </div>
+            <div class="contact-section">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.2rem;">Contact Information</h3>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>piyush.sharma4698@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-linkedin"></i>
+                    <span>linkedin.com/in/piyushs98</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+1 (316) 299-3190</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Columbia, SC, United States</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-building"></i>
+                    <span>Sensor Electronic Technology, Inc</span>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="content-wrapper">
+                <div id="tab1" class="tab-content active">
+                    <div class="story-section">
+                        <div class="story-content">
+                            <h2 class="story-title">My Journey: From Iron Man Dreams to Engineering Innovation</h2>
+                           
+                            <div class="iron-man-quote">
+                                "I am Iron Man" - Those three words changed my life when I was just 8 years old, watching Tony Stark in that first Iron Man movie. The way he built something extraordinary from nothing, the way technology could solve real-world problems, the way innovation could make a difference - that's when I knew I wanted to be an engineer.
+                            </div>
+
+                            <p class="story-paragraph">
+                                Growing up in India, I was that kid who took apart every electronic device I could get my hands on - much to my parents' dismay! Remote controls, old radios, even my father's calculator once (I got in serious trouble for that one). But each dismantled device taught me something new about how things worked, how electricity flowed, how components came together to create something magical.
+                            </p>
+
+                            <p class="story-paragraph">
+                                The Iron Man movies weren't just entertainment for me - they were inspiration. Tony Stark's arc reactor, his innovative approach to solving problems, his ability to see solutions where others saw obstacles - that became my blueprint. I started dreaming about creating technologies that could change the world, just like Stark Industries, but for real people with real problems.
+                            </p>
+
+                            <p class="story-paragraph">
+                                My journey began formally at MIT Academy of Engineering in India, where I pursued my Bachelor's in Electrical and Electronics Engineering from 2016 to 2020. Those four years were transformative - I learned the fundamentals, but more importantly, I learned to think like an engineer. Every circuit I designed, every project I completed, brought me closer to that Iron Man dream of creating something that mattered.
+                            </p>
+
+                            <p class="story-paragraph">
+                                The real adventure started when I decided to pursue my Master's in the United States. Landing at Wichita State University for my Master of Engineering in Electrical Engineering Technologies (2020-2022) was like stepping into Stark's workshop for the first time. The resources, the research opportunities, the chance to work on cutting-edge projects - it was everything I had dreamed of.
+                            </p>
+
+                            <p class="story-paragraph">
+                                At the National Institute for Aviation Research, I got my first taste of real innovation. Working as a Graduate Research Assistant and later as a Research Engineer on the KART (Kansas Aviation Research Technology) Project, I was designing electrical systems for hybrid airships. It wasn't an arc reactor, but it was technology that could change transportation, reduce emissions, and solve real-world problems. I was finally living my Iron Man dream.
+                            </p>
+
+                            <p class="story-paragraph">
+                                But life had bigger plans for me. In 2022, I joined Sensor Electronic Technology, Inc. in South Carolina, and that's where my true calling revealed itself. UV technology - specifically UV-LED systems for disinfection and hygiene applications. It might not seem as glamorous as Iron Man's suits, but think about it: technology that can eliminate harmful microorganisms, make our daily lives safer, protect public health - that's exactly the kind of innovation Tony Stark would be proud of.
+                            </p>
+
+                            <p class="story-paragraph">
+                                Starting as an Electrical Design Engineer, I dove deep into PCB design, LED optimization, and customer solutions. But the real magic happened when I became an Application Engineer in 2024. Suddenly, I wasn't just designing circuits - I was leading a team, managing lab operations, optimizing processes, and most importantly, inventing solutions that could be patented and brought to market.
+                            </p>
+
+                            <p class="story-paragraph">
+                                The patent applications started flowing - 13 and counting! From footwear treatment systems that use UV light to eliminate odors and microorganisms, to faucet illumination systems that provide antimicrobial protection, to VR headset sterilization stands, to automotive air purification systems. Each patent represents a real-world problem solved, a piece of technology that makes life better for people.
+                            </p>
+
+                            <p class="story-paragraph">
+                                When I redesigned our wafer burn-in station and reduced test time from 20 hours to just 7 hours while increasing current capacity by 150%, I realized I had found my superpower. Not the ability to fly or shoot repulsors, but the ability to see inefficiencies and engineer elegant solutions. That optimization saved our company $50K-$60K annually and accelerated our product development cycle.
+                            </p>
+
+                            <p class="story-paragraph">
+                                Today, as I pursue my Executive Master's in Project Management at Tennessee Wesleyan University while continuing my innovation work, I'm building the bridge between technical excellence and business leadership - just like Tony Stark evolved from engineer to CEO to global innovator.
+                            </p>
+
+                            <p class="story-paragraph">
+                                Managing a team of 4 technicians, improving error resolution by 30%, and continuously pushing the boundaries of UV technology applications - this is my Stark Industries. Every day, I'm working on technologies that protect people's health, solve hygiene challenges, and make the world a little bit safer.
+                            </p>
+
+                            <p class="story-paragraph">
+                                The 8-year-old boy who was inspired by Iron Man has grown into an engineer who's creating real-world solutions. From India to Kansas to South Carolina, from student to researcher to innovation leader, every step has been guided by that fundamental belief that technology can change the world.
+                            </p>
+
+                            <div class="iron-man-quote">
+                                "Sometimes you gotta run before you can walk" - Tony Stark. That's exactly what I've been doing - running toward innovation, toward solutions, toward a future where technology serves humanity. And just like Tony Stark, I'm not done yet. The best innovations are still to come.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab2" class="tab-content">
+                    <div class="section">
+                        <h3><i class="fas fa-bullseye"></i>Professional Identity & Brand</h3>
+                        <div class="floating-icon"><i class="fas fa-user-astronaut"></i></div>
+                        <p><strong>Previous Role:</strong> <span style="background: var(--accent-gradient); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-weight: 600;">Application Engineer</span> at Sensor Electronic Technology, Inc</p>
+                        <br>
+                        <p><strong>Industry Focus:</strong> Semiconductor UV/Photonic Systems</p>
+                        <p><strong>Professional Tagline:</strong> "R&D/product development engineer focused on UV/photonic systems with a deep reliability mindset"</p>
+                        <p><strong>Value Proposition:</strong> Bridges research and manufacturing, owning lab operations, PCB design, materials/optics integration, and vendor/customer collaboration to turn concepts into robust, shippable hardware</p>
+                        <p><strong>Years of Experience:</strong> 6+ years in electrical design and engineering</p>
+                        <p><strong>Industry Standing:</strong> Named inventor on 13+ utility patents across disinfection, AR optics, self-healing coatings, ESD mitigation, and consumer hygiene</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-award"></i>Key Achievements & Recognition</h3>
+                        <div class="floating-icon"><i class="fas fa-medal"></i></div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-lightbulb"></i> Innovation Leadership</h4>
+                            <p>13+ patent applications filed across UV disinfection, consumer hygiene, and photonic systems</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-tachometer-alt"></i> Process Optimization</h4>
+                            <p>Reduced burn-in test time from 20 to 7 hours while increasing current capacity from 60mA to 150mA</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-dollar-sign"></i> Cost Management</h4>
+                            <p>Achieved $50K-$60K in annual service cost savings through insourced maintenance and optimization</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-users"></i> Team Leadership</h4>
+                            <p>Successfully manages 4-person characterization lab team with 30% improvement in error resolution</p>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-chart-bar"></i>Professional Metrics</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 1.5rem;">
+                            <div class="metric-card">
+                                <div class="metric-value">13+</div>
+                                <div>Patent Applications</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">3.2 yrs</div>
+                                <div>Company Tenure</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">$60K</div>
+                                <div>Cost Savings Achieved</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">4</div>
+                                <div>Team Members Managed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-star"></i>Professional Brand Positioning</h3>
+                        <div class="floating-icon"><i class="fas fa-rocket"></i></div>
+                        <p><strong>Unique Value:</strong> Rare combination of deep UV/photonic expertise with practical PCB design and manufacturing knowledge</p>
+                        <p><strong>Market Position:</strong> Bridge between academic research and commercial applications in emerging UV technology markets</p>
+                        <p><strong>Thought Leadership:</strong> Patent portfolio demonstrates consistent innovation in practical consumer and industrial applications</p>
+                        <p><strong>Industry Recognition:</strong> Emerging leader in UV disinfection technology with proven track record of turning concepts into products</p>
+                    </div>
+                </div>
+
+                <div id="tab3" class="tab-content">
+                    <div class="section">
+                        <h3><i class="fas fa-route"></i>Career Timeline & Progression</h3>
+                        <div class="floating-icon"><i class="fas fa-mountain"></i></div>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h4><span style="background: var(--accent-gradient); color: white; padding: 0.3rem 0.8rem; border-radius: 12px;">Application Engineer</span> - Sensor Electronic Technology, Inc</h4>
+                                <p><strong>Jan 2024 - Sept 2025 (1 yr 9 mos)</strong></p>
+                                <p>• Directed end-to-end characterization lab operations managing 4 technicians</p>
+                                <p>• Redesigned wafer burn-in station profile - increased current from 60mA to 150mA</p>
+                                <p>• Cut test time from 20 to 7 hours, accelerating reliability screening</p>
+                                <p>• Named inventor on 13 utility patent applications</p>
+                                <p>• Saved $50K-$60K in service costs through insourced maintenance</p>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <h4><span style="background: var(--primary-gradient); color: white; padding: 0.3rem 0.8rem; border-radius: 12px;">Electrical Design Engineer</span> - Sensor Electronic Technology, Inc</h4>
+                                <p><strong>Aug 2022 - Dec 2023 (1 yr 5 mos)</strong></p>
+                                <p>• Designed customer-fit PCBs in Altium Designer</p>
+                                <p>• Optimized LED selection (flux, Vf, thermal) and driver-based solutions</p>
+                                <p>• Served as technical liaison between customers and suppliers</p>
+                                <p>• Characterized and validated boards using integrating sphere</p>
+                            </div>
+
+                            <div class="timeline-item">
+                                <h4><span style="background: var(--secondary-gradient); color: white; padding: 0.3rem 0.8rem; border-radius: 12px;">Electrical Design Engineer</span> - Servotech Inc (Contract)</h4>
+                                <p><strong>Aug 2022 (1 month)</strong></p>
+                                <p>• Designed engine systems including requirements definition and concept development</p>
+                                <p>• Provided technical leadership to Manufacturing, Quality, and Purchasing teams</p>
+                            </div>
+
+                            <div class="timeline-item">
+                                <h4><span style="background: var(--warning-gradient); color: #2d3436; padding: 0.3rem 0.8rem; border-radius: 12px;">Research Engineer</span> - National Institute for Aviation Research</h4>
+                                <p><strong>Jun 2022 - Jul 2022 (2 mos)</strong></p>
+                                <p>• Electrical Lead for KART (Kansas Aviation Research Technology) Project</p>
+                                <p>• Designed electrical schematics on Autodesk Eagle for PCB layout</p>
+                                <p>• Performed Dymola Dynamic Modelling for Airship optimization</p>
+                            </div>
+
+                            <div class="timeline-item">
+                                <h4><span style="background: var(--success-gradient); color: white; padding: 0.3rem 0.8rem; border-radius: 12px;">Graduate Research Assistant</span> - National Institute for Aviation Research</h4>
+                                <p><strong>Mar 2021 - May 2022 (1 yr 3 mos)</strong></p>
+                                <p>• Researched and developed hybrid airship using 3D Experience</p>
+                                <p>• Optimized power distribution for propulsion systems</p>
+                                <p>• Designed and tested propeller with acoustic noise reduction</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-rocket"></i>Career Velocity Analysis</h3>
+                        <div class="floating-icon"><i class="fas fa-chart-line"></i></div>
+                        <p><strong>Promotion Pattern:</strong> Rapid advancement from Graduate Research Assistant to Application Engineer in 3 years</p>
+                        <p><strong>Industry Transition:</strong> Successfully moved from aviation research to semiconductor UV technology</p>
+                        <p><strong>Geographic Mobility:</strong> Kansas → Georgia → South Carolina (following opportunities)</p>
+                        <p><strong>Role Evolution:</strong> Research → Design → Application Engineering → Team Leadership</p>
+                        <p><strong>Future Trajectory:</strong> Likely progression to Senior Application Engineer or R&D Manager roles</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-compass"></i>Career Progression Insights</h3>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-microscope"></i> Technical Depth</h4>
+                                <p>Consistent focus on electrical design and engineering across different industries</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-lightbulb"></i> Innovation Focus</h4>
+                                <p>Patent development accelerated significantly in current role - 13+ applications in 2 years</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-crown"></i> Leadership Growth</h4>
+                                <p>Evolved from individual contributor to team manager with process optimization focus</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-exchange-alt"></i> Industry Adaptation</h4>
+                                <p>Successfully transitioned from aviation to semiconductor, demonstrating adaptability</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab4" class="tab-content">
+                    <div class="section">
+                        <h3><i class="fas fa-tools"></i>Core Technical Competencies</h3>
+                        <div class="floating-icon"><i class="fas fa-microchip"></i></div>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-drafting-compass"></i> PCB Design & CAD</h4>
+                                <p><strong>Expert Level:</strong> Altium Designer, SOLIDWORKS, AutoCAD Electrical</p>
+                                <p>Customer-fit PCB design, schematic development, 3D modeling</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-sun"></i> UV/Photonic Systems</h4>
+                                <p><strong>Specialist:</strong> UV-LED characterization, optical integration</p>
+                                <p>Deep UV systems, photocatalytic applications, disinfection technology</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-vial"></i> Semiconductor Testing</h4>
+                                <p><strong>Advanced:</strong> Burn-in testing, PL mapping, XRD analysis</p>
+                                <p>Wafer-level characterization, reliability screening, quality control</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-flask"></i> Lab Operations</h4>
+                                <p><strong>Management:</strong> Team leadership, SOP development</p>
+                                <p>Equipment maintenance, calibration, vendor management</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-project-diagram"></i> Project Management</h4>
+                                <p><strong>Developing:</strong> Currently pursuing Executive M.S.</p>
+                                <p>Cross-functional collaboration, timeline management</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-lightbulb"></i> Innovation & Patents</h4>
+                                <p><strong>Proven:</strong> 13+ patent applications</p>
+                                <p>Invention disclosure, IP development, commercialization</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-laptop-code"></i>Technical Tools & Software</h3>
+                        <div class="floating-icon"><i class="fas fa-code"></i></div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 1.5rem;">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-paint-brush"></i> Design Software</h4>
+                                Altium Designer<br>
+                                SOLIDWORKS<br>
+                                AutoCAD Electrical<br>
+                                3DEXPERIENCE
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-chart-area"></i> Analysis Tools</h4>
+                                Dymola<br>
+                                Integrating Sphere<br>
+                                XRD Systems<br>
+                                PL Mapping
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-hammer"></i> Development</h4>
+                                Autodesk Eagle<br>
+                                PCB Layout<br>
+                                Schematic Design<br>
+                                3D Printing
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-briefcase"></i> Business Tools</h4>
+                                Microsoft Office<br>
+                                PowerPoint<br>
+                                Project Management<br>
+                                Technical Writing
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-graduation-cap"></i>Education & Continuous Learning</h3>
+                        <div class="floating-icon"><i class="fas fa-book-open"></i></div>
+                        <p><strong>Current Education:</strong> Executive Master's in Project Management (Tennessee Wesleyan University, 2025-2027)</p>
+                        <p><strong>Recent Degree:</strong> Master of Engineering in Electrical Engineering Technologies (Wichita State University, 2020-2022)</p>
+                        <p><strong>Foundation:</strong> Bachelor of Technology in Electrical and Electronics Engineering (MIT Academy of Engineering, 2016-2020)</p>
+                        <p><strong>Learning Focus:</strong> Bridging technical expertise with business management skills</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-certificate"></i>Technical Certifications & Specializations</h3>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4>UV Technology</h4>
+                                <p>Deep UV-LED systems, wavelength optimization, photocatalytic applications</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4>Semiconductor Reliability</h4>
+                                <p>Burn-in testing, accelerated aging, failure analysis, quality control</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4>Optical Systems</h4>
+                                <p>LED characterization, flux optimization, thermal management</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4>Process Optimization</h4>
+                                <p>Lean manufacturing, efficiency improvement, cost reduction strategies</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab5" class="tab-content">
+                    <div class="section">
+                        <h3><i class="fas fa-file-contract"></i>Patent Portfolio Overview</h3>
+                        <div class="floating-icon"><i class="fas fa-lightbulb"></i></div>
+                        <div class="patent-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">13+</span>
+                                <div class="stat-label">Total Patents</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">4</span>
+                                <div class="stat-label">Application Areas</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">2024-2025</span>
+                                <div class="stat-label">Filing Period</div>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">UV Tech</span>
+                                <div class="stat-label">Core Focus</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-star"></i>Featured Patent Applications</h3>
+                        <div class="floating-icon"><i class="fas fa-certificate"></i></div>
+                        
+                        <div class="patent-card">
+                            <div class="patent-title">Footwear Treatment System</div>
+                            <div class="patent-number">US Patent Application #20250113976</div>
+                            <div class="patent-status">Published</div>
+                            <div class="patent-description">
+                                Revolutionary UV-LED system designed for footwear disinfection featuring elongate cylindrical supports that insert into shoes. The system directs UV light into footwear interiors while simultaneously circulating and filtering air. Reduces microorganisms and odor-causing compounds to acceptable levels through targeted UV exposure and air treatment.
+                            </div>
+                            <div class="patent-tech-tags">
+                                <span class="tech-tag">UV-LED Technology</span>
+                                <span class="tech-tag">Air Filtration</span>
+                                <span class="tech-tag">Consumer Hygiene</span>
+                                <span class="tech-tag">Disinfection Systems</span>
+                            </div>
+                        </div>
+
+                        <div class="patent-card">
+                            <div class="patent-title">Faucet Illumination System</div>
+                            <div class="patent-number">Application #63/673,811</div>
+                            <div class="patent-status">Filed</div>
+                            <div class="patent-description">
+                                Innovative faucet/tap design incorporating integrated UV-LEDs to inhibit mold growth and reduce microbial load. Suitable for residential, commercial, and healthcare applications. The system provides continuous antimicrobial protection at the point of water delivery, addressing hygiene concerns in high-touch water fixtures.
+                            </div>
+                            <div class="patent-tech-tags">
+                                <span class="tech-tag">UV-LED Integration</span>
+                                <span class="tech-tag">Antimicrobial Systems</span>
+                                <span class="tech-tag">Water Fixtures</span>
+                                <span class="tech-tag">Healthcare Applications</span>
+                            </div>
+                        </div>
+
+                        <div class="patent-card">
+                            <div class="patent-title">Headset Sterilization Stand</div>
+                            <div class="patent-number">Application #63/652,425</div>
+                            <div class="patent-status">Filed</div>
+                            <div class="patent-description">
+                                Advanced VR/AR headset stand that provides UV-C disinfection while simultaneously charging the device. Features ergonomic design with both elevated and non-elevated configuration options. Addresses the growing need for hygiene solutions in shared VR/AR environments and personal use scenarios.
+                            </div>
+                            <div class="patent-tech-tags">
+                                <span class="tech-tag">UV-C Sterilization</span>
+                                <span class="tech-tag">VR/AR Technology</span>
+                                <span class="tech-tag">Charging Systems</span>
+                                <span class="tech-tag">Ergonomic Design</span>
+                            </div>
+                        </div>
+
+                        <div class="patent-card">
+                            <div class="patent-title">Motor Vehicle Deodorizer</div>
+                            <div class="patent-number">Application #63/652,425</div>
+                            <div class="patent-status">Filed</div>
+                            <div class="patent-description">
+                                Sophisticated UV-LED system utilizing wavelengths below 390nm with TiO₂ photocatalytic technology for in-cabin air purification. Designed specifically for electric and hybrid vehicles, the system provides continuous air treatment and helps preserve perishables through advanced photocatalytic oxidation processes.
+                            </div>
+                            <div class="patent-tech-tags">
+                                <span class="tech-tag">Photocatalytic Oxidation</span>
+                                <span class="tech-tag">TiO₂ Technology</span>
+                                <span class="tech-tag">Automotive Applications</span>
+                                <span class="tech-tag">Air Purification</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-bullseye"></i>Patent Strategy & Innovation Focus</h3>
+                        <div class="floating-icon"><i class="fas fa-chess"></i></div>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-home"></i> Consumer Hygiene</h4>
+                                <p>Focus on practical daily-use applications like footwear treatment and personal device sterilization</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-hospital"></i> Healthcare Solutions</h4>
+                                <p>Antimicrobial systems for medical environments and high-touch surfaces</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-car"></i> Automotive Innovation</h4>
+                                <p>Advanced air purification systems for modern electric and hybrid vehicles</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-puzzle-piece"></i> Technology Integration</h4>
+                                <p>Seamless integration of UV technology with existing products and infrastructure</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-chart-line"></i>Innovation Themes & Trends</h3>
+                        <div class="floating-icon"><i class="fas fa-trending-up"></i></div>
+                        <p><strong>Core Technology:</strong> UV-LED systems with wavelength optimization for specific applications</p>
+                        <p><strong>Application Focus:</strong> Practical consumer and commercial hygiene solutions</p>
+                        <p><strong>Design Philosophy:</strong> Integration of disinfection technology into everyday objects and environments</p>
+                        <p><strong>Market Timing:</strong> Post-pandemic focus on hygiene and antimicrobial solutions</p>
+                        <p><strong>Technical Approach:</strong> Combination of UV technology with complementary systems (air filtration, charging, photocatalysis)</p>
+                    </div>
+                </div>
+
+                <div id="tab6" class="tab-content">
+                    <div class="section">
+                        <h3><i class="fas fa-comments"></i>Communication & Leadership Style</h3>
+                        <div class="floating-icon"><i class="fas fa-user-tie"></i></div>
+                        <p><strong>Communication Pattern:</strong> Technical precision with practical application focus</p>
+                        <p><strong>Leadership Approach:</strong> Hands-on technical leadership with team development focus</p>
+                        <p><strong>Problem-Solving Style:</strong> Systematic, data-driven approach with reliability mindset</p>
+                        <p><strong>Collaboration Preference:</strong> Cross-functional teamwork, vendor partnerships, customer liaison</p>
+                        <p><strong>Innovation Mindset:</strong> Practical innovation focused on real-world applications</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-puzzle-piece"></i>Personality Indicators</h3>
+                        <div class="floating-icon"><i class="fas fa-brain"></i></div>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-lightbulb"></i> Technical Innovator</h4>
+                                <p>Combines deep technical knowledge with practical innovation. 13+ patents demonstrate creative problem-solving ability inspired by Iron Man's approach to engineering challenges.</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-sitemap"></i> Systems Thinker</h4>
+                                <p>Bridges research and manufacturing, understanding both theoretical concepts and practical implementation, much like Tony Stark's holistic approach to technology.</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-shield-alt"></i> Reliability Focused</h4>
+                                <p>Deep reliability mindset evident in burn-in optimization and quality improvement initiatives, ensuring robust solutions for real-world applications.</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-users-cog"></i> Team Builder</h4>
+                                <p>Successfully manages technical teams, implements process improvements, and develops SOPs, demonstrating leadership qualities beyond pure technical skills.</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-infinity"></i> Continuous Learner</h4>
+                                <p>Pursuing Executive M.S. while working full-time, demonstrating commitment to professional growth and evolution from engineer to leader.</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-handshake"></i> Customer-Centric</h4>
+                                <p>Strong focus on customer requirements and serving as technical liaison between stakeholders, ensuring solutions meet real-world needs.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-cog"></i>Work Style Preferences</h3>
+                        <div class="floating-icon"><i class="fas fa-user-cog"></i></div>
+                        <p><strong>Environment:</strong> Prefers hands-on lab environments with direct equipment access</p>
+                        <p><strong>Structure:</strong> Values systematic processes, SOPs, and standardized procedures</p>
+                        <p><strong>Autonomy:</strong> Thrives with ownership of end-to-end processes and operations</p>
+                        <p><strong>Collaboration:</strong> Enjoys cross-functional work and vendor/customer interactions</p>
+                        <p><strong>Innovation:</strong> Focuses on practical innovations with commercial applications</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-star"></i>Communication Strengths</h3>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-language"></i> Technical Translation</h4>
+                                <p>Excellent at explaining complex technical concepts to non-technical stakeholders</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-globe"></i> Cross-Cultural Communication</h4>
+                                <p>International background enables effective communication across diverse teams</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-file-alt"></i> Process Documentation</h4>
+                                <p>Strong technical writing skills evident in patent applications and SOPs</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-handshake"></i> Stakeholder Management</h4>
+                                <p>Effective liaison between customers, suppliers, and internal teams</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab7" class="tab-content">
+                    <div class="section">
+                        <h3><i class="fas fa-globe"></i>Personal Background & Journey</h3>
+                        <div class="floating-icon"><i class="fas fa-heart"></i></div>
+                        <p><strong>Geographic Journey:</strong> India → Kansas → Georgia → South Carolina</p>
+                        <p><strong>Cultural Background:</strong> Indian heritage with strong adaptation to US professional environment</p>
+                        <p><strong>International Experience:</strong> Internships in Dubai (L&T Hydrocarbon) and India (Sapura Energy)</p>
+                        <p><strong>Inspiration Source:</strong> Iron Man movies sparked initial interest in engineering and innovation</p>
+                        <p><strong>Life Philosophy:</strong> Technology should solve real-world problems and make life better for people</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-star"></i>Personal Values & Motivations</h3>
+                        <div class="floating-icon"><i class="fas fa-compass"></i></div>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-rocket"></i> Innovation Impact</h4>
+                                <p>Driven by creating practical solutions that improve daily life, inspired by Tony Stark's approach to using technology for positive change</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-medal"></i> Technical Excellence</h4>
+                                <p>Committed to deep technical understanding and reliable engineering solutions that can withstand real-world applications</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-seedling"></i> Continuous Growth</h4>
+                                <p>Pursuing executive education while building patent portfolio demonstrates growth mindset and evolution from engineer to leader</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-users"></i> Team Development</h4>
+                                <p>Values team building and process improvement for collective success, understanding that great innovations require great teams</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-balance-scale"></i>Work-Life Integration</h3>
+                        <div class="floating-icon"><i class="fas fa-home"></i></div>
+                        <p><strong>Career Focus:</strong> Currently in intensive career-building phase with patent development</p>
+                        <p><strong>Education Balance:</strong> Managing Executive M.S. program alongside full-time engineering role</p>
+                        <p><strong>Geographic Stability:</strong> Established in South Carolina with Sensor Electronic Technology</p>
+                        <p><strong>Professional Development:</strong> Active in patent filing and technical innovation</p>
+                        <p><strong>Industry Engagement:</strong> Focused on UV/photonic systems and semiconductor applications</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-users"></i>Community & Professional Involvement</h3>
+                        <p><strong>Patent Community:</strong> Active inventor in UV disinfection and consumer hygiene technologies</p>
+                        <p><strong>Academic Connections:</strong> Maintains ties to Wichita State University and Tennessee Wesleyan</p>
+                        <p><strong>Industry Networks:</strong> Semiconductor and UV technology professional communities</p>
+                        <p><strong>Mentorship Potential:</strong> Likely mentor for international students in engineering programs</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-heart"></i>Personal Interests & Hobbies</h3>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4><i class="fas fa-laptop"></i> Technology Innovation</h4>
+                                <p>Passionate about emerging technologies and their practical applications</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-puzzle-piece"></i> Problem Solving</h4>
+                                <p>Enjoys tackling complex technical challenges and finding elegant solutions</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-book"></i> Learning & Development</h4>
+                                <p>Committed to continuous education and professional skill enhancement</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4><i class="fas fa-globe-americas"></i> Cross-Cultural Exchange</h4>
+                                <p>Values diverse perspectives and international collaboration</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab8" class="tab-content">
+                    <div class="section">
+                        <h3><i class="fas fa-trophy"></i>Critical Success Factors</h3>
+                        <div class="floating-icon"><i class="fas fa-crown"></i></div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-microscope"></i> Technical Innovation Leadership</h4>
+                            <p>Exceptional ability to translate research concepts into practical, patentable solutions. 13+ patent applications demonstrate consistent innovation pipeline inspired by systematic problem-solving approach.</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-tachometer-alt"></i> Process Optimization Expertise</h4>
+                            <p>Proven track record of improving efficiency - reduced burn-in test time from 20 to 7 hours while increasing current capacity 2.5x, demonstrating ability to see and solve systemic inefficiencies.</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-handshake"></i> Cross-Functional Collaboration</h4>
+                            <p>Excels as technical liaison between customers, suppliers, and internal teams. Bridges research and manufacturing effectively, ensuring solutions are both innovative and practical.</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-dollar-sign"></i> Cost Management & Savings</h4>
+                            <p>Delivered $50K-$60K in service cost savings through insourced maintenance and vendor optimization, proving that innovation can drive both technical and business value.</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-users-cog"></i> Team Leadership & Development</h4>
+                            <p>Successfully manages 4-person technical team with improved error resolution (30% increase in 3 months), demonstrating evolution from individual contributor to effective leader.</p>
+                        </div>
+                        <div class="success-factor">
+                            <h4><i class="fas fa-shield-alt"></i> Reliability-First Mindset</h4>
+                            <p>Deep focus on reliability and quality control drives sustainable engineering solutions and customer satisfaction, ensuring innovations work in real-world conditions.</p>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-chart-bar"></i>Performance Indicators</h3>
+                        <div class="floating-icon"><i class="fas fa-chart-line"></i></div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 1.5rem;">
+                            <div class="metric-card">
+                                <div class="metric-value">65%</div>
+                                <div>Test Time Reduction</div>
+                                <small>Burn-in optimization: 20h → 7h</small>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">150%</div>
+                                <div>Current Capacity Increase</div>
+                                <small>60mA → 150mA per wafer</small>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">30%</div>
+                                <div>Error Resolution Improvement</div>
+                                <small>Within 3 months of implementation</small>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">$55K</div>
+                                <div>Average Annual Savings</div>
+                                <small>Service cost optimization</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-rocket"></i>Competitive Advantages</h3>
+                        <div class="floating-icon"><i class="fas fa-star"></i></div>
+                        <p><strong>Unique Skill Combination:</strong> Rare blend of deep UV/photonic expertise with practical PCB design and manufacturing knowledge</p>
+                        <p><strong>Patent Portfolio:</strong> Strong IP development capability across multiple application areas</p>
+                        <p><strong>International Perspective:</strong> Global experience from India, Dubai, and US provides diverse problem-solving approaches</p>
+                        <p><strong>Academic-Industry Bridge:</strong> Successfully transitioned from academic research to commercial applications</p>
+                        <p><strong>Emerging Technology Focus:</strong> Positioned at forefront of UV disinfection and semiconductor applications</p>
+                    </div>
+
+                    <div class="section">
+                        <h3><i class="fas fa-lightbulb"></i>Innovation Methodology</h3>
+                        <div class="skill-grid">
+                            <div class="skill-item">
+                                <h4>Problem Identification</h4>
+                                <p>Identifies practical problems in consumer and industrial applications</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4>Technical Solution</h4>
+                                <p>Applies UV/photonic expertise to develop innovative solutions</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4>Patent Development</h4>
+                                <p>Systematically documents and protects intellectual property</p>
+                            </div>
+                            <div class="skill-item">
+                                <h4>Commercial Validation</h4>
+                                <p>Focuses on practical, manufacturable solutions with market potential</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Tab functionality
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        // Floating particles
+        function createParticles() {
+            const container = document.querySelector('.floating-particles');
+            for (let i = 0; i < 35; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 3 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+        // Scroll progress indicator
+        function updateScrollProgress() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollProgress = (scrollTop / scrollHeight) * 100;
+            document.querySelector('.scroll-progress').style.width = scrollProgress + '%';
+        }
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            window.addEventListener('scroll', updateScrollProgress);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
